@@ -2,12 +2,14 @@ package main
 
 import (
 	"echo-api/db"
+	"echo-api/domain"
 
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
-	db.Init()
+	dbConn := db.Init()
+	dbConn.AutoMigrate(&domain.User{})
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
