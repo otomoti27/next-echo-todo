@@ -26,19 +26,20 @@ func NewService(ur UserRepository) *Service {
 	}
 }
 
-func (s *Service) SignUp(user domain.User) (domain.User, error) {
+func (s *Service) SignUp(user domain.User) (domain.UserResponse, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return domain.User{}, err
+		return domain.UserResponse{}, err
 	}
 
 	newUser := domain.User{Email: user.Email, Password: string(hashedPassword), Name: user.Name}
 	err = s.userRepo.Create(&newUser)
 	if err != nil {
-		return domain.User{}, err
+		return domain.UserResponse{}, err
 	}
 
-	return newUser, nil
+	resUser := domain.UserResponse{ID: newUser.ID, Email: newUser.Email, Name: newUser.Name}
+	return resUser, nil
 }
 
 func (s *Service) LogIn(user domain.User) (string, error) {

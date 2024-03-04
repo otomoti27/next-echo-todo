@@ -3,6 +3,9 @@ package main
 import (
 	"echo-api/db"
 	"echo-api/domain"
+	"echo-api/internal/repository"
+	"echo-api/internal/rest"
+	"echo-api/service/user"
 
 	"github.com/labstack/echo/v4"
 )
@@ -12,8 +15,10 @@ func main() {
 	dbConn.AutoMigrate(&domain.User{})
 
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(200, "Hello, World!")
-	})
+
+	userRepo := repository.NewUserRepository(dbConn)
+	userService := user.NewService(userRepo)
+	rest.NewUserHandler(e, userService)
+
 	e.Logger.Fatal(e.Start(":8080"))
 }
