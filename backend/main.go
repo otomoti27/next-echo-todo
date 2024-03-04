@@ -5,6 +5,7 @@ import (
 	"echo-api/domain"
 	"echo-api/internal/repository"
 	"echo-api/internal/rest"
+	"echo-api/internal/rest/middleware"
 	"echo-api/service/user"
 
 	"github.com/labstack/echo/v4"
@@ -15,6 +16,7 @@ func main() {
 	dbConn.AutoMigrate(&domain.User{})
 
 	e := echo.New()
+	e.Use(middleware.CORS())
 
 	userRepo := repository.NewUserRepository(dbConn)
 	userService := user.NewService(userRepo)
