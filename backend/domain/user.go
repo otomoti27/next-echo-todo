@@ -1,6 +1,11 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
+)
 
 type User struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
@@ -16,3 +21,9 @@ type UserResponse struct {
 	Email string `json:"email"`
 	Name  string `json:"name"`
 }
+
+var (
+	UserEmailRule    = []validation.Rule{validation.Required, is.Email}
+	UserPasswordRule = []validation.Rule{validation.Required, validation.Length(6, 100)}
+	UserNameRule     = []validation.Rule{validation.Required}
+)

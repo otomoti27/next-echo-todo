@@ -37,6 +37,7 @@ func (u *UserHandler) SignUp(c echo.Context) error {
 
 	resUser, err := u.Service.SignUp(user)
 	if err != nil {
+		// TODO: バリデーションエラーの場合は400を返す
 		return c.JSON(http.StatusInternalServerError, ResponseError{Message: err.Error()})
 	}
 

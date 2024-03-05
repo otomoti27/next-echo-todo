@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -27,6 +28,15 @@ func NewService(ur UserRepository) *Service {
 }
 
 func (s *Service) SignUp(user domain.User) (domain.UserResponse, error) {
+	err := validation.ValidateStruct(&user,
+		validation.Field(&user.Email, domain.UserEmailRule...),
+		validation.Field(&user.Password, domain.UserPasswordRule...),
+		validation.Field(&user.Name, domain.UserNameRule...),
+	)
+	if err != nil {
+		return domain.UserResponse{}, err
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return domain.UserResponse{}, err
@@ -43,8 +53,16 @@ func (s *Service) SignUp(user domain.User) (domain.UserResponse, error) {
 }
 
 func (s *Service) LogIn(user domain.User) (string, error) {
+	err := validation.ValidateStruct(&user,
+		validation.Field(&user.Email, domain.UserEmailRule...),
+		validation.Field(&user.Password, domain.UserPasswordRule...),
+	)
+	if err != nil {
+		return "", err
+	}
+
 	var u domain.User
-	err := s.userRepo.GetByEmail(&u, user.Email)
+	err = s.userRepo.GetByEmail(&u, user.Email)
 	if err != nil {
 		return "", err
 	}
