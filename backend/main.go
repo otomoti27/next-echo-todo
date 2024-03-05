@@ -17,6 +17,7 @@ func main() {
 
 	e := echo.New()
 	e.Use(middleware.CORS())
+	e.Use(middleware.CSRF())
 
 	userRepo := repository.NewUserRepository(dbConn)
 	userService := user.NewService(userRepo)

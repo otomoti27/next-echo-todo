@@ -26,6 +26,7 @@ func NewUserHandler(e *echo.Echo, us UserService) {
 	e.POST("/signup", handler.SignUp)
 	e.POST("/login", handler.LogIn)
 	e.POST("/logout", handler.LogOut)
+	e.GET("/csrf", handler.CsrfToken)
 }
 
 func (u *UserHandler) SignUp(c echo.Context) error {
@@ -80,4 +81,9 @@ func (u *UserHandler) LogOut(c echo.Context) error {
 	c.SetCookie(cookie)
 
 	return c.NoContent(http.StatusOK)
+}
+
+func (u *UserHandler) CsrfToken(c echo.Context) error {
+	token := c.Get("csrf").(string)
+	return c.JSON(http.StatusOK, echo.Map{"csrf_token": token})
 }
