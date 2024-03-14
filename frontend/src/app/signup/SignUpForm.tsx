@@ -1,9 +1,12 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { signup } from './actions'
+import { UserSchema } from './schema'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -15,38 +18,39 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-
-const schema = z
-  .object({
-    username: z
-      .string()
-      .min(1, 'ユーザー名を入力してください')
-      .max(32, 'ユーザー名は32文字以内で入力してください'),
-    email: z.string().email('メールアドレスを入力してください'),
-    password: z
-      .string()
-      .min(6, 'パスワードは6文字以上で入力してください')
-      .max(32, 'パスワードは32文字以内で入力してください'),
-    passwordConfirm: z.string().min(1, '確認用のパスワードを入力してください'),
-  })
-  .refine((data) => data.password === data.passwordConfirm, {
-    message: 'パスワードが一致しません',
-    path: ['passwordConfirm'],
-  })
+import { useToast } from '@/components/ui/use-toast'
 
 export const SignUpForm = () => {
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  const form = useForm<z.infer<typeof UserSchema>>({
+    resolver: zodResolver(UserSchema),
     defaultValues: {
-      username: '',
+      name: '',
       email: '',
       password: '',
       passwordConfirm: '',
     },
   })
+  const router = useRouter()
+  const { toast } = useToast()
 
-  function onSubmit(data: z.infer<typeof schema>) {
+  async function onSubmit(data: z.infer<typeof UserSchema>) {
     console.log(data)
+    const res = await signup(data)
+    console.log('action res', res)
+
+    if (!res.success) {
+      toast({
+        description: '会員登録に失敗しました',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    toast({
+      description: '会員登録に成功しました',
+    })
+
+    router.push('/login')
   }
 
   return (
@@ -54,7 +58,7 @@ export const SignUpForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
         <FormField
           control={form.control}
-          name='username'
+          name='name'
           render={({ field }) => (
             <FormItem>
               <FormLabel>ユーザー名</FormLabel>

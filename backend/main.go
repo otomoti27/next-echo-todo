@@ -9,6 +9,7 @@ import (
 	"echo-api/service/user"
 
 	"github.com/labstack/echo/v4"
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -18,6 +19,7 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.CORS())
 	e.Use(middleware.CSRF())
+	e.Use(echoMiddleware.Logger())
 
 	userRepo := repository.NewUserRepository(dbConn)
 	userService := user.NewService(userRepo)

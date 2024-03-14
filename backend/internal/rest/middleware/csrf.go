@@ -14,5 +14,6 @@ func CSRF() echo.MiddlewareFunc {
 		CookieDomain:   os.Getenv("API_DOMAIN"),
 		CookieHTTPOnly: true,
 		CookieSameSite: http.SameSiteNoneMode,
+		CookieSecure:   true,
 	})
 }

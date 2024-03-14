@@ -24,5 +24,12 @@ services:
       - ./backend/.env
     depends_on:
       - db
+  https-portal3000:
+    image: steveltn/https-portal:1
+    ports:
+      - "3443:443"
+    environment:
+      STAGE: local
+      DOMAINS: "localhost -> http://host.docker.internal:8080"
 volumes:
   db-storage:

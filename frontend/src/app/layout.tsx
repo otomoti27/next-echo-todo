@@ -1,7 +1,11 @@
 import type { Metadata } from 'next'
 import { Inter as FontSans } from 'next/font/google'
 import './globals.css'
+import { CSRFToken } from './CSRFToken'
+import { Toaster } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
+
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -16,7 +20,7 @@ export const metadata: Metadata = {
   description: 'Next.js + echoの学習用Todoアプリ',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
@@ -30,6 +34,8 @@ export default function RootLayout({
         )}
       >
         <div className='mx-auto max-w-screen-lg px-4'>{children}</div>
+        <Toaster />
+        <CSRFToken />
       </body>
     </html>
   )
