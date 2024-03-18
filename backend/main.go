@@ -19,7 +19,9 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.CORS())
 	e.Use(middleware.CSRF())
-	e.Use(echoMiddleware.Logger())
+	e.Use(echoMiddleware.LoggerWithConfig(echoMiddleware.LoggerConfig{
+		Format: "time=${time_rfc3339}, method=${method}, uri=${uri}, status=${status}\n",
+	}))
 
 	userRepo := repository.NewUserRepository(dbConn)
 	userService := user.NewService(userRepo)
