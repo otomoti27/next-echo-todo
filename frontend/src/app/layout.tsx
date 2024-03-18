@@ -5,7 +5,9 @@ import { CSRFToken } from './CSRFToken'
 import { Toaster } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
+if (process.env.NODE_ENV === 'development') {
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
+}
 
 const fontSans = FontSans({
   subsets: ['latin'],

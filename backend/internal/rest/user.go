@@ -58,7 +58,7 @@ func (u *UserHandler) LogIn(c echo.Context) error {
 	cookie := new(http.Cookie)
 	cookie.Name = "token"
 	cookie.Value = token
-	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Expires = time.Now().Add(24 * time.Hour * 30)
 	cookie.Path = "/"
 	cookie.Domain = os.Getenv("API_DOMAIN")
 	cookie.Secure = true
@@ -66,7 +66,7 @@ func (u *UserHandler) LogIn(c echo.Context) error {
 	cookie.SameSite = http.SameSiteNoneMode
 	c.SetCookie(cookie)
 
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, echo.Map{"token": token})
 }
 
 func (u *UserHandler) LogOut(c echo.Context) error {

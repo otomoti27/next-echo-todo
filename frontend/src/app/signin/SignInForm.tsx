@@ -3,15 +3,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 
-import { signup } from './actions'
-import { UserSchema } from './schema'
+import { signin } from './actions'
+import { FormSchema, FormType } from './schema'
 import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -20,53 +18,39 @@ import {
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 
-export const SignUpForm = () => {
-  const form = useForm<z.infer<typeof UserSchema>>({
-    resolver: zodResolver(UserSchema),
+export const SignInForm = () => {
+  const form = useForm<FormType>({
+    resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: '',
       email: '',
       password: '',
-      passwordConfirm: '',
     },
   })
   const router = useRouter()
   const { toast } = useToast()
 
-  async function onSubmit(data: z.infer<typeof UserSchema>) {
-    const res = await signup(data)
+  async function onSubmit(data: FormType) {
+    const res = await signin(data)
 
     if (!res.success) {
       toast({
-        description: '会員登録に失敗しました',
+        title: 'エラー',
+        description: 'メールアドレスまたはパスワードが間違っています',
         variant: 'destructive',
       })
       return
     }
 
     toast({
-      description: '会員登録に成功しました',
+      description: 'ログインに成功しました',
     })
 
-    router.push('/login')
+    router.push('/todos')
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-        <FormField
-          control={form.control}
-          name='name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>ユーザー名</FormLabel>
-              <FormControl>
-                <Input placeholder='山田太郎' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <FormField
           control={form.control}
           name='email'
@@ -89,25 +73,11 @@ export const SignUpForm = () => {
               <FormControl>
                 <Input type='password' {...field} />
               </FormControl>
-              <FormDescription>６文字以上</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name='passwordConfirm'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>パスワード確認</FormLabel>
-              <FormControl>
-                <Input type='password' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type='submit'>サインアップ</Button>
+        <Button type='submit'>サインイン</Button>
       </form>
     </Form>
   )
