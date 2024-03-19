@@ -2,16 +2,19 @@ package rest
 
 import (
 	"echo-api/domain"
+	"echo-api/internal/rest/middleware"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
 type UserService interface {
 	SignUp(user domain.User) (domain.UserResponse, error)
 	LogIn(user domain.User) (string, error)
+	FetchMe(id uint) (domain.UserResponse, error)
 }
 
 type UserHandler struct {
@@ -27,6 +30,10 @@ func NewUserHandler(e *echo.Echo, us UserService) {
 	e.POST("/login", handler.LogIn)
 	e.POST("/logout", handler.LogOut)
 	e.GET("/csrf", handler.CsrfToken)
+
+	a := e.Group("/auth")
+	a.Use(middleware.JWT())
+	a.GET("/me", handler.Me)
 }
 
 func (u *UserHandler) SignUp(c echo.Context) error {
@@ -87,4 +94,17 @@ func (u *UserHandler) LogOut(c echo.Context) error {
 func (u *UserHandler) CsrfToken(c echo.Context) error {
 	token := c.Get("csrf").(string)
 	return c.JSON(http.StatusOK, echo.Map{"csrf_token": token})
+}
+
+func (u *UserHandler) Me(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"].(float64)
+
+	resUser, err := u.Service.FetchMe(uint(userId))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, ResponseError{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, resUser)
 }

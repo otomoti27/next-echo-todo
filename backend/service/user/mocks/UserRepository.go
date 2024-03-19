@@ -67,6 +67,24 @@ func (_m *UserRepository) GetByEmail(_a0 *domain.User, email string) error {
 	return r0
 }
 
+// GetByID provides a mock function with given fields: _a0, id
+func (_m *UserRepository) GetByID(_a0 *domain.User, id uint) error {
+	ret := _m.Called(_a0, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetByID")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*domain.User, uint) error); ok {
+		r0 = rf(_a0, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Update provides a mock function with given fields: _a0
 func (_m *UserRepository) Update(_a0 *domain.User) error {
 	ret := _m.Called(_a0)

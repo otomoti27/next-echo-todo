@@ -76,6 +76,41 @@ func TestUserRepository_GetByEmail(t *testing.T) {
 	}
 }
 
+func TestUserRepository_GetByID(t *testing.T) {
+	gormDB, sqlMock, err := mocks.NewMockSQL()
+	if err != nil {
+		t.Fatalf("sqlmockの作成に失敗しました: %s", err)
+	}
+
+	db, err := gormDB.DB()
+	if err != nil {
+		t.Error(err)
+	}
+	defer db.Close()
+
+	repo := repository.NewUserRepository(gormDB)
+
+	testTime := time.Now()
+
+	sqlMock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? ORDER BY `users`.`id` LIMIT ?")).
+		WithArgs(1, 1).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "email", "password", "name", "created_at", "updated_at"}).
+			AddRow(1, "test@example.com", "password", "テストユーザー", testTime, testTime))
+
+	user := &domain.User{}
+	if err := repo.GetByID(user, 1); err != nil {
+		t.Errorf("ユーザーの取得に失敗しました: %v", err)
+	}
+
+	if user.ID != 1 {
+		t.Errorf("期待されたユーザーが取得されませんでした: %v", user)
+	}
+
+	if err := sqlMock.ExpectationsWereMet(); err != nil {
+		t.Errorf("failed to ExpectationWerMet(): %s", err)
+	}
+}
+
 func TestUserRepository_Update(t *testing.T) {
 	gormDB, sqlMock, err := mocks.NewMockSQL()
 	if err != nil {

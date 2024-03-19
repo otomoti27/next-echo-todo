@@ -12,6 +12,7 @@ import (
 
 type UserRepository interface {
 	GetByEmail(user *domain.User, email string) error
+	GetByID(user *domain.User, id uint) error
 	Create(user *domain.User) error
 	Update(user *domain.User) error
 	Delete(user *domain.User) error
@@ -78,4 +79,15 @@ func (s *Service) LogIn(user domain.User) (string, error) {
 	})
 
 	return token.SignedString([]byte(os.Getenv("SECRET")))
+}
+
+func (s *Service) FetchMe(id uint) (domain.UserResponse, error) {
+	var u domain.User
+	err := s.userRepo.GetByID(&u, id)
+	if err != nil {
+		return domain.UserResponse{}, err
+	}
+
+	resUser := domain.UserResponse{ID: u.ID, Email: u.Email, Name: u.Name}
+	return resUser, nil
 }

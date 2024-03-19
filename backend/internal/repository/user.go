@@ -18,6 +18,10 @@ func (ur *UserRepository) GetByEmail(user *domain.User, email string) error {
 	return ur.db.Where("email = ?", email).First(user).Error
 }
 
+func (ur *UserRepository) GetByID(user *domain.User, id uint) error {
+	return ur.db.First(user, id).Error
+}
+
 func (ur *UserRepository) Create(user *domain.User) error {
 	return ur.db.Create(user).Error
 }
