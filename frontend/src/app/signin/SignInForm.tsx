@@ -45,7 +45,7 @@ export const SignInForm = () => {
       description: 'ログインに成功しました',
     })
 
-    router.push('/todos')
+    router.push('/u/todos')
   }
 
   return (
